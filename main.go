@@ -56,12 +56,6 @@ func domainBak(_domain string) {
 
 
 			}
-			/*
-			if  strings.TrimRight(_domain,"\n") == "google.com" {
-				log.Println("[!] Alexa Top 1.000.000'da")
-			}
-			*/
-		
 	}
 }
 func check(e error) {
