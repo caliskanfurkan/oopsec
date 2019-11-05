@@ -10,34 +10,6 @@ import (
 	"github.com/likexian/whois-go"
 	"github.com/likexian/whois-parser-go"
 )
-
-func check(e error) {
-    if e != nil {
-        panic(e)
-    }
-}
-
-type CsvLine struct {
-    sira string
-    domain string
-}
-
-func ReadCsv(filename string) ([][]string, error) {
-
-    f, err := os.Open(filename)
-    if err != nil {
-        return [][]string{}, err
-    }
-    defer f.Close()
-
-    lines, err := csv.NewReader(f).ReadAll()
-    if err != nil {
-        return [][]string{}, err
-    }
-
-    return lines, nil
-}
-
 func main() {
 
 	file, err := os.Open("iocs")
@@ -91,3 +63,31 @@ func domainBak(_domain string) {
 		
 	}
 }
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
+
+type CsvLine struct {
+    sira string
+    domain string
+}
+
+func ReadCsv(filename string) ([][]string, error) {
+
+    f, err := os.Open(filename)
+    if err != nil {
+        return [][]string{}, err
+    }
+    defer f.Close()
+
+    lines, err := csv.NewReader(f).ReadAll()
+    if err != nil {
+        return [][]string{}, err
+    }
+
+    return lines, nil
+}
+
+
