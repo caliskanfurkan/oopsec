@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"fmt"
+	"strings"
 	"encoding/csv"
 	"os"
 	"bufio"
@@ -44,7 +45,7 @@ func main() {
 	    log.Fatal(err)
 	}
 	defer file.Close()
-	
+
 	lines, err := ReadCsv("top-1m.csv")
 	if err != nil {
 		panic(err)
@@ -57,7 +58,6 @@ func main() {
 		}
 		fmt.Println(data.sira + " " + data.domain)
 	    }
-
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -77,6 +77,11 @@ func domainBak(_domain string) {
 		if erriki == nil {
 			createdate := resultik.Registrar.CreatedDate
 			log.Println(string(createdate))
+
+			// Burayı listeden aldır ama döngü kösmesin	
+			if  strings.TrimRight(_domain,"\n") == "google.com" {
+				log.Println("[!] Alexa Top 1.000.000'da")
+			}
 		}
 	}
 }
