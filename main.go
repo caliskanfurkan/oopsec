@@ -2,11 +2,11 @@ package main
 
 import (
 	"log"
-	"fmt"
 	"strings"
 	"encoding/csv"
 	"os"
 	"bufio"
+	"fmt"
 	"github.com/likexian/whois-go"
 	"github.com/likexian/whois-parser-go"
 )
@@ -35,7 +35,7 @@ func domainBak(_domain string) {
 		resultik, erriki := whoisparser.Parse(result)
 		if erriki == nil {
 			createdate := resultik.Registrar.CreatedDate
-			log.Println(string(createdate))
+			fmt.Print(string(createdate))
 
 			_temizDomain := strings.TrimRight(_domain,"\n")
 			 lines, err := ReadCsv("top-1m.csv")
@@ -49,9 +49,10 @@ func domainBak(_domain string) {
 				    domain: line[1],
 				}
 				if _temizDomain==data.domain {
-					log.Println("[!] Top 1M'da")
+					fmt.Print(" -> [!] Top 1M'da")
 				}
 	                 }
+			 fmt.Println()
 
 
 			}
