@@ -46,19 +46,6 @@ func main() {
 	}
 	defer file.Close()
 
-	lines, err := ReadCsv("top-1m.csv")
-	if err != nil {
-		panic(err)
-	}
-
-	for _, line := range lines {
-		data := CsvLine{
-		    sira: line[0],
-		    domain: line[1],
-		}
-		fmt.Println(data.sira + " " + data.domain)
-	    }
-
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 	    fmt.Print(scanner.Text()+"\r\t\t\t\t")
@@ -78,10 +65,29 @@ func domainBak(_domain string) {
 			createdate := resultik.Registrar.CreatedDate
 			log.Println(string(createdate))
 
-			// Burayı listeden aldır ama döngü kösmesin	
+			_temizDomain := strings.TrimRight(_domain,"\n")
+			 lines, err := ReadCsv("top-1m.csv")
+			 if err != nil {
+					panic(err)
+		         }
+
+			for _, line := range lines {
+				data := CsvLine{
+				    sira: line[0],
+				    domain: line[1],
+				}
+				if _temizDomain==data.domain {
+					log.Println("[!] Top 1M'da")
+				}
+	                 }
+
+
+			}
+			/*
 			if  strings.TrimRight(_domain,"\n") == "google.com" {
 				log.Println("[!] Alexa Top 1.000.000'da")
 			}
-		}
+			*/
+		
 	}
 }
