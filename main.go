@@ -6,14 +6,13 @@ import (
 	"strings"
 	"encoding/csv"
 	"os"
+	"net"
 	"bufio"
 	"fmt"
 	"regexp"
 	"github.com/likexian/whois-go"
 	"github.com/likexian/whois-parser-go"
 )
-
-var iocler []string
 
 func main() {
 
@@ -26,9 +25,17 @@ func main() {
 	scanner := bufio.NewScanner(file)
         // Line'lar her zaman strings.ToLower geçmeli parametre olurken	
 	for scanner.Scan() {
-	    fmt.Print(temizle(scanner.Text())+"\t\t\t\t\t\t\t\t|||-->")
-	    fmt.Println(checkIOCType(temizle(scanner.Text())))
-	    //domainTop1Mmi(scanner.Text())
+	    _ioc := scanner.Text()
+	    fmt.Print(temizle(_ioc)+"  \t\t\t\t|||-->")
+	    fmt.Println(checkIOCType(temizle(_ioc)))
+	    //domainTop1Mmi(_ioc) // Eğer domainse
+	    if checkIOCType(temizle(_ioc)) == "ip" {
+		deger,_:= privateIP(_ioc) 
+		if deger {
+			fmt.Println("*** private ip***")
+                }
+	    }
+
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -45,6 +52,23 @@ func temizle(_domain string) string{
 
 	return son
 }
+
+
+func privateIP(ip string) (bool, error) {
+    var err error
+    private := false
+    IP := net.ParseIP(ip)
+    if IP == nil {
+        log.Fatal(err)
+    } else {
+        _, private24BitBlock, _ := net.ParseCIDR("10.0.0.0/8")
+        _, private20BitBlock, _ := net.ParseCIDR("172.16.0.0/12")
+        _, private16BitBlock, _ := net.ParseCIDR("192.168.0.0/16")
+        private = private24BitBlock.Contains(IP) || private20BitBlock.Contains(IP) || private16BitBlock.Contains(IP)
+    }
+    return private, err
+}
+
 
 func domainTop1Mmi(_domain string) {
 	result, err := whois.Whois(_domain)
