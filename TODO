@@ -1,16 +1,22 @@
-IP'ler için
+Genel
+----------------
+- Sanitize olmuşları analiz öncesi temizleme [.], hxxp/hxxps
+- URL'leri analiz öncesi domain'e çevirme
+- Domain, hash, IP IOC'ler karmaşık da verilse hepsini gruplama
 
+IP'ler için
+----------------
 - Local IP'mi?
 ? ASN repütasyonu
 - IPVoid sayısı?
 
 Domain
-
+----------------
 + Kayıt tarihi 
 - <90 gün belirt
 + Alexa TOP 1M
 
 Hash
-
+----------------
 - Legit Windows system hash'i mi? (Windows 7/10)
 - NSRL
