@@ -26,6 +26,7 @@ func main() {
         // Line'lar her zaman strings.ToLower geçmeli parametre olurken	
 	for scanner.Scan() {
 	    _ioc := temizle(strings.ToLower(scanner.Text()))
+	    if (_ioc=="") {continue}
 	    fmt.Print("[!]\t\t"+ _ioc + "\t\t")
 	    fmt.Print(checkIOCType(_ioc)+"\t")
 	    if (checkIOCType(_ioc)=="domain") { 
@@ -81,24 +82,21 @@ func domainTop1Mmi(_domain string) bool{
 		if erriki == nil {
 			createdate := resultik.Registrar.CreatedDate
 			fmt.Print(string(createdate))
-
 			_temizDomain := strings.TrimRight(_domain,"\n")
 			 lines, err := readCsv("top-1m.csv")
 			 if err != nil {
 					panic(err)
 		         }
-
-			for _, line := range lines {
+			 for _, line := range lines {
 				data := csvLine{
 				    sira: line[0],
 				    domain: line[1],
 				}
 				if _temizDomain==data.domain {
-					//fmt.Print(" -> [!] Top 1M'da")
 					return true
 				}
 	                 }
-			 fmt.Println()
+			 fmt.Print()
 
 
 			}
