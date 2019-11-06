@@ -25,17 +25,21 @@ func main() {
 	scanner := bufio.NewScanner(file)
         // Line'lar her zaman strings.ToLower geçmeli parametre olurken	
 	for scanner.Scan() {
-	    _ioc := scanner.Text()
-	    fmt.Print(temizle(_ioc)+"  \t\t\t\t|||-->")
-	    fmt.Println(checkIOCType(temizle(_ioc)))
-	    //domainTop1Mmi(_ioc) // Eğer domainse
+	    _ioc := temizle(strings.ToLower(scanner.Text()))
+	    fmt.Print("[!]\t\t"+ _ioc + "\t\t")
+	    fmt.Print(checkIOCType(_ioc)+"\t")
+	    if (checkIOCType(_ioc)=="domain") { 
+			if domainTop1Mmi(_ioc)  {
+				fmt.Print("\tTop 1M'de\t")
+			}
+	    }
 	    if checkIOCType(temizle(_ioc)) == "ip" {
 		deger,_:= privateIP(_ioc) 
 		if deger {
-			fmt.Println("*** private ip***")
+			fmt.Print("\tPrivate-IP")
                 }
 	    }
-
+        fmt.Print("\n")
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -70,7 +74,7 @@ func privateIP(ip string) (bool, error) {
 }
 
 
-func domainTop1Mmi(_domain string) {
+func domainTop1Mmi(_domain string) bool{
 	result, err := whois.Whois(_domain)
 	if err == nil {
 		resultik, erriki := whoisparser.Parse(result)
@@ -90,7 +94,8 @@ func domainTop1Mmi(_domain string) {
 				    domain: line[1],
 				}
 				if _temizDomain==data.domain {
-					fmt.Print(" -> [!] Top 1M'da")
+					//fmt.Print(" -> [!] Top 1M'da")
+					return true
 				}
 	                 }
 			 fmt.Println()
@@ -98,6 +103,7 @@ func domainTop1Mmi(_domain string) {
 
 			}
 	}
+	return false
 }
 func check(e error) {
     if e != nil {
