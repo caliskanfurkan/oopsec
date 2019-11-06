@@ -10,6 +10,9 @@ import (
 	"github.com/likexian/whois-go"
 	"github.com/likexian/whois-parser-go"
 )
+
+var iocler []string
+
 func main() {
 
 	file, err := os.Open("iocs")
@@ -31,7 +34,11 @@ func main() {
 
 
 func domainTemizle(_domain string) string{
-	return strings.Replace(_domain, "[.]",".",-1)
+	_domainL := strings.ToLower(_domain)
+	bir:= strings.Replace(_domainL, "[.]",".",-1)
+	iki:= strings.Replace(bir,"hxxp","http",-1)
+
+	return iki
 }
 
 func domainBak(_domain string) {
