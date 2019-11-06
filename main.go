@@ -20,13 +20,18 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-	    fmt.Println(scanner.Text())
+	    fmt.Println(domainTemizle(scanner.Text()))
 	    //domainBak(scanner.Text())
 	}
 
 	if err := scanner.Err(); err != nil {
 	    log.Fatal(err)
 	}
+}
+
+
+func domainTemizle(_domain string) string{
+	return strings.Replace(_domain, "[.]",".",-1)
 }
 
 func domainBak(_domain string) {
