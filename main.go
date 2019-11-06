@@ -20,8 +20,8 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-	    fmt.Print(scanner.Text()+"\r\t\t\t\t")
-	    domainBak(scanner.Text())
+	    fmt.Println(scanner.Text())
+	    //domainBak(scanner.Text())
 	}
 
 	if err := scanner.Err(); err != nil {
