@@ -141,18 +141,19 @@ func checkIOCType(line string) string {
 		return "domain"
 	} else if reIP.MatchString(line) {
 		return "ip"
-	}
+	} else {
 		return "hash"
+	}
 }
 
 func extractDomainFromURL(gelenURL string) string {
-if strings.Contains(gelenURL,"/") {
-	    u,_ := tld.Parse(gelenURL)	
-	if u.Subdomain == "" {
-		return u.Domain+"."+u.TLD
-        }	
-	return u.Subdomain+"."+u.Domain+"."+u.TLD
-}
-return gelenURL
+	if strings.Contains(gelenURL,"/") {
+		u,_ := tld.Parse(gelenURL)
+			if u.Subdomain == "" {
+				return u.Domain+"."+u.TLD
+			}
+			return u.Subdomain+"."+u.Domain+"."+u.TLD
+	}
+	return gelenURL
 
 }
