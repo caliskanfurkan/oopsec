@@ -1,20 +1,81 @@
 package main
 
 import (
+	"net/http"
+	"html/template"
 	"log"
 	"github.com/jpillora/go-tld"
 	"strings"
 	"encoding/csv"
 	"os"
 	"net"
-	"bufio"
 	"fmt"
 	"regexp"
 	"github.com/likexian/whois-go"
 	"github.com/likexian/whois-parser-go"
+	"github.com/gorilla/mux"
+    //"github.com/davecgh/go-spew/spew"
+
 )
 
 func main() {
+
+	r := mux.NewRouter()
+
+	r.HandleFunc("/", postHandler)
+
+	http.ListenAndServe(":8080", r)
+}
+
+
+func postHandler(w http.ResponseWriter, r *http.Request) {
+
+    if r.Method == "GET" {
+        t, _ := template.ParseFiles("ioccheck.gtpl")
+        t.Execute(w, nil)
+    } else {
+        r.ParseForm()
+        ekranaYaz(r.Form["iocs"])
+    }
+}
+
+func ekranaYaz(iocler []string) {
+
+//spew.Dump(iocler[0])
+
+tnp:=strings.Split(iocler[0],"\r\n")
+
+	
+for _, sit := range tnp {
+
+
+    _ioc := temizle(strings.ToLower(sit))
+    if (_ioc=="") {continue}
+    fmt.Print("[!]\t\t"+ _ioc + "\t\t")
+    fmt.Print(checkIOCType(_ioc)+"\t")
+    if (checkIOCType(_ioc)=="domain") { 
+		if domainTop1Mmi(_ioc)  {
+			fmt.Print("\tTop 1M'de\t")
+		}
+    }
+
+    if checkIOCType(temizle(_ioc)) == "ip" {
+	deger,_:= privateIP(_ioc) 
+	if deger {
+		fmt.Print("\tPrivate-IP")
+            }
+    }
+    fmt.Print("\n")
+}
+
+
+
+}
+
+
+
+/*
+func yaz() {
 
 	file, err := os.Open("iocs")
 	if err != nil {
@@ -23,7 +84,6 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-        // Line'lar her zaman strings.ToLower geçmeli parametre olurken	
 	for scanner.Scan() {
 	    _ioc := temizle(strings.ToLower(scanner.Text()))
 	    if (_ioc=="") {continue}
@@ -46,10 +106,11 @@ func main() {
 	if err := scanner.Err(); err != nil {
 	    log.Fatal(err)
 	}
-}
 
 
-func temizle(_domain string) string{
+}*/
+
+func temizle(_domain string) string {
 	_domainL := strings.ToLower(_domain)
 	bir:= strings.Replace(_domainL, "[.]",".",-1)
 	iki:= strings.Replace(bir,"hxxp","http",-1)
@@ -75,7 +136,7 @@ func privateIP(ip string) (bool, error) {
 }
 
 
-func domainTop1Mmi(_domain string) bool{
+func domainTop1Mmi(_domain string) bool {
 	result, err := whois.Whois(_domain)
 	if err == nil {
 		resultik, erriki := whoisparser.Parse(result)
@@ -92,7 +153,7 @@ func domainTop1Mmi(_domain string) bool{
 				    sira: line[0],
 				    domain: line[1],
 				}
-				if _temizDomain==data.domain {
+				if _temizDomain == data.domain {
 					return true
 				}
 	                 }
@@ -150,7 +211,7 @@ func extractDomainFromURL(gelenURL string) string {
 			if u.Subdomain == "" {
 				return u.Domain+"."+u.TLD
 			}
-			return u.Subdomain+"."+u.Domain+"."+u.TLD
+			return u.Subdomain + "." + u.Domain + "." + u.TLD
 	}
 	return gelenURL
 
