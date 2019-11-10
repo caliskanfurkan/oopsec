@@ -58,11 +58,12 @@ func ekranaYaz(iocler []string, w http.ResponseWriter) {
 	    if (checkIOCType(_ioc)=="domain") {
 			if domainTop1Mmi(_ioc)  {
 				htmlOlus += "   Top 1M'de    "
-				result, _ := whois.Whois(_ioc)
-				resultik, _ := whoisparser.Parse(result)
-				createdate := resultik.Registrar.CreatedDate
-				htmlOlus+=string(createdate)+"  "
 			}
+			result, _ := whois.Whois(_ioc)
+			resultik, _ := whoisparser.Parse(result)
+			createdate := resultik.Registrar.CreatedDate
+			htmlOlus+=string(createdate)+"  "
+
 	    }
 
 	    if checkIOCType(temizle(_ioc)) == "ip" {
