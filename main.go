@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+//	"net/url"
 	"html/template"
 	"log"
 	"github.com/jpillora/go-tld"
@@ -14,8 +15,7 @@ import (
 	"github.com/likexian/whois-go"
 	"github.com/likexian/whois-parser-go"
 	"github.com/gorilla/mux"
-    //"github.com/davecgh/go-spew/spew"
-
+  //      "github.com/davecgh/go-spew/spew"
 )
 
 func main() {
@@ -35,86 +35,61 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
         t.Execute(w, nil)
     } else {
         r.ParseForm()
-        ekranaYaz(r.Form["iocs"])
+        ekranaYaz(r.Form["iocs"], w)
     }
 }
 
-func ekranaYaz(iocler []string) {
+func ekranaYaz(iocler []string, w http.ResponseWriter) {
 
-//spew.Dump(iocler[0])
+	htmlOlus:="<html><body>"
 
-tnp:=strings.Split(iocler[0],"\r\n")
+	tnp:=strings.Split(iocler[0],"\r\n")
 
-	
-for _, sit := range tnp {
+	for _, sit := range tnp {
 
+	    _ioc := temizle(strings.ToLower(sit))
 
-    _ioc := temizle(strings.ToLower(sit))
-    if (_ioc=="") {continue}
-    fmt.Print("[!]\t\t"+ _ioc + "\t\t")
-    fmt.Print(checkIOCType(_ioc)+"\t")
-    if (checkIOCType(_ioc)=="domain") { 
-		if domainTop1Mmi(_ioc)  {
-			fmt.Print("\tTop 1M'de\t")
-		}
-    }
-
-    if checkIOCType(temizle(_ioc)) == "ip" {
-	deger,_:= privateIP(_ioc) 
-	if deger {
-		fmt.Print("\tPrivate-IP")
-            }
-    }
-    fmt.Print("\n")
-}
-
-
-
-}
-
-
-
-/*
-func yaz() {
-
-	file, err := os.Open("iocs")
-	if err != nil {
-	    log.Fatal(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-	    _ioc := temizle(strings.ToLower(scanner.Text()))
 	    if (_ioc=="") {continue}
-	    fmt.Print("[!]\t\t"+ _ioc + "\t\t")
-	    fmt.Print(checkIOCType(_ioc)+"\t")
-	    if (checkIOCType(_ioc)=="domain") { 
+
+	    htmlOlus += "[!]  "+ _ioc + "    "
+
+	    htmlOlus += checkIOCType(_ioc)+"       "
+
+	    if (checkIOCType(_ioc)=="domain") {
 			if domainTop1Mmi(_ioc)  {
-				fmt.Print("\tTop 1M'de\t")
+				htmlOlus += "   Top 1M'de    "
+				result, _ := whois.Whois(_ioc)
+				resultik, _ := whoisparser.Parse(result)
+				createdate := resultik.Registrar.CreatedDate
+				htmlOlus+=string(createdate)+"  "
 			}
 	    }
+
 	    if checkIOCType(temizle(_ioc)) == "ip" {
-		deger,_:= privateIP(_ioc) 
+
+		deger, _ := privateIP(_ioc)
+
 		if deger {
-			fmt.Print("\tPrivate-IP")
-                }
+			htmlOlus+="\t****---PrivateIP---****"
+	         }
 	    }
-        fmt.Print("\n")
+
+	    htmlOlus+="<br>"
 	}
 
-	if err := scanner.Err(); err != nil {
-	    log.Fatal(err)
-	}
+htmlOlus+="</body></html>"
 
+w.Header().Set("Content-Type", "text/html")
+w.Write([]byte(htmlOlus))
 
-}*/
+}
+
 
 func temizle(_domain string) string {
-	_domainL := strings.ToLower(_domain)
-	bir:= strings.Replace(_domainL, "[.]",".",-1)
-	iki:= strings.Replace(bir,"hxxp","http",-1)
-	son := extractDomainFromURL(iki)
+	_domainL  := strings.ToLower(_domain)
+	bir	  := strings.Replace(_domainL, "[.]",".",-1)
+	iki	  := strings.Replace(bir,"hxxp","http",-1)
+	son	  := extractDomainFromURL(iki)
 
 	return son
 }
@@ -137,12 +112,6 @@ func privateIP(ip string) (bool, error) {
 
 
 func domainTop1Mmi(_domain string) bool {
-	result, err := whois.Whois(_domain)
-	if err == nil {
-		resultik, erriki := whoisparser.Parse(result)
-		if erriki == nil {
-			createdate := resultik.Registrar.CreatedDate
-			fmt.Print(string(createdate))
 			_temizDomain := strings.TrimRight(_domain,"\n")
 			 lines, err := readCsv("top-1m.csv")
 			 if err != nil {
@@ -158,12 +127,9 @@ func domainTop1Mmi(_domain string) bool {
 				}
 	                 }
 			 fmt.Print()
-
-
-			}
-	}
 	return false
 }
+
 func check(e error) {
     if e != nil {
         panic(e)
