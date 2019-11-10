@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-//	"net/url"
 	"html/template"
 	"log"
 	"github.com/jpillora/go-tld"
@@ -15,15 +14,12 @@ import (
 	"github.com/likexian/whois-go"
 	"github.com/likexian/whois-parser-go"
 	"github.com/gorilla/mux"
-  //      "github.com/davecgh/go-spew/spew"
 )
 
 func main() {
 
 	r := mux.NewRouter()
-
 	r.HandleFunc("/", postHandler)
-
 	http.ListenAndServe(":8080", r)
 }
 
@@ -41,7 +37,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 
 func ekranaYaz(iocler []string, w http.ResponseWriter) {
 
-	htmlOlus:="<html><body>"
+	htmlOlus:="<html><head><title>IOC kontrolü</title></head><body><table>"
 
 	tnp:=strings.Split(iocler[0],"\r\n")
 
@@ -51,34 +47,31 @@ func ekranaYaz(iocler []string, w http.ResponseWriter) {
 
 	    if (_ioc=="") {continue}
 
-	    htmlOlus += "[!]  "+ _ioc + "    "
+	    htmlOlus += "<tr><td>"+ _ioc + "</td><td>"
 
-	    htmlOlus += checkIOCType(_ioc)+"       "
+	    htmlOlus += checkIOCType(_ioc)+"</td><td>"
 
 	    if (checkIOCType(_ioc)=="domain") {
+			htmlOlus+= "<td>"
 			if domainTop1Mmi(_ioc)  {
-				htmlOlus += "   Top 1M'de    "
+				htmlOlus += "Top 1Mde"
 			}
+			htmlOlus+= "</td>"
 			result, _ := whois.Whois(_ioc)
 			resultik, _ := whoisparser.Parse(result)
 			createdate := resultik.Registrar.CreatedDate
-			htmlOlus+=string(createdate)+"  "
-
+			htmlOlus+="<td>"+string(createdate)+"</td>"
 	    }
-
 	    if checkIOCType(temizle(_ioc)) == "ip" {
-
 		deger, _ := privateIP(_ioc)
-
 		if deger {
-			htmlOlus+="\t****---PrivateIP---****"
+			htmlOlus+="<td><font color=red>****---PrivateIP---****</font></td>"
 	         }
 	    }
-
-	    htmlOlus+="<br>"
+	    htmlOlus+="</tr>"
 	}
 
-htmlOlus+="</body></html>"
+htmlOlus+="</table></body></html>"
 
 w.Header().Set("Content-Type", "text/html")
 w.Write([]byte(htmlOlus))
